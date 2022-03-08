@@ -1,4 +1,3 @@
-from ast import Str
 import os
 import sys
 import torch
@@ -15,7 +14,7 @@ class Config:
 
         self.OPT_USE_ADAM:bool = True
 
-        self.LOAD_MODEL:bool = True
+        self.LOAD_MODEL:bool = False
         self.MODEL_NAME:str = "89_98.pth"
         self.MODEL_SAVE_THRESHOLD:float = 89.6
 
