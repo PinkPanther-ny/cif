@@ -2,6 +2,8 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
+from config import configs
+
 class preprocessor:
 
     # transform_train = transforms.Compose([
@@ -32,10 +34,11 @@ class preprocessor:
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ])
     
-    def __init__(self, data_dir, batch_size, n_workers) -> None:
-        self.data_dir = data_dir
-        self.batch_size = batch_size
-        self.n_workers = n_workers
+    def __init__(self) -> None:
+        
+        self.data_dir = configs.DATA_DIR
+        self.batch_size = configs.BATCH_SIZE
+        self.n_workers = configs.NUM_WORKERS
         
     def get_loader(self):
 
