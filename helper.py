@@ -1,6 +1,5 @@
 import time
 import torch
-from settings import *
 from config import configs
 
 class Timer:
