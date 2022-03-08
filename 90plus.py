@@ -1,19 +1,16 @@
 import torch
 
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-import torchvision.models as models
-from helper import Timer, eval_class, eval_total
+import gc
 
+from helper import Timer, eval_class, eval_total
 from model_class import Net
 from preprocess import preprocessor
 from settings import *
 
-import gc
 
 def main():
-
 
     timer = Timer()
     p = preprocessor(DATA_DIR, BATCH_SIZE, NUM_WORKERS)
@@ -42,6 +39,7 @@ def main():
     opts = [opt2, opt1]
     opt_use_adam = OPT_USE_ADAM
     
+    # ========================== Train =============================
     for epoch in range(TOTAL_EPOCHS):
         optimizer = opts[int(opt_use_adam)]
         
@@ -62,7 +60,6 @@ def main():
             running_loss += loss.item() * inputs.shape[0]
             
             count_log = int(len(trainloader) / N_LOGS_PER_EPOCH)
-            # print(count_log, inputs.shape)
             if i % count_log == count_log - 1:
                 print(f'[{epoch + 1}(Epochs), {i + 1:5d}(batches)] loss: {running_loss / count_log:.3f}')
                 running_loss = 0.0
