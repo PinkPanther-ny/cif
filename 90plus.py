@@ -1,8 +1,4 @@
-import math
-import sys
 import torch
-import torchvision
-import torchvision.transforms as transforms
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,69 +7,22 @@ import torchvision.models as models
 from helper import Timer, eval_class, eval_total
 
 from model_class import Net
-import settings
+from preprocess import preprocessor
 from settings import *
 
 import gc
 
 def main():
 
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),  #先四周填充0，在吧影象隨機裁剪成32*32
-        transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
-        ])
-
-    # transform_train = transforms.Compose([
-    #     transforms.RandomResizedCrop(32, scale=(0.8, 1.1), ratio=(0.75, 1.333333)),
-    #     transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
-    #     transforms.RandomRotation(degrees=(-20, 20)),  #影象一半的概率翻轉，一半的概率不翻轉
-    #     transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.25, hue=0.2),
-    #     transforms.ToTensor(),
-    #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
-    #     ])
-
-    # transform_train = transforms.Compose([
-    #     transforms.Resize(size=(224, 224)),
-    #     transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
-    #     transforms.ToTensor(),
-    #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
-    #     ])
-
-    transform_test = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-        ])
 
     timer = Timer()
+    p = preprocessor(DATA_DIR, BATCH_SIZE, NUM_WORKERS)
+    trainloader, testloader = p.get_loader()
     
-    def preprocess():
-
-        trainset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True,
-                                                download=True, transform=transform_train)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
-                                                shuffle=True, num_workers=NUM_WORKERS)
-
-        testset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False,
-                                            download=True, transform=transform_test)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
-                                                shuffle=False, num_workers=NUM_WORKERS)
-        # Return iterable which contains data in blocks, block size equals to batch size
-        return trainloader, testloader
-    
-
-    trainloader, testloader = preprocess()
-
-
     model = Net()
     
     if LOAD_MODEL:
         model.load_state_dict(torch.load(MODEL_DIR + MODEL_NAME))
-    
-    # del model._modules["resnet18"]
-    # torch.save(model.state_dict(), model_dir + "87_92_1.pth")
-    # return
 
     # Assuming that we are on a CUDA machine
     model.to(DEVICE)
@@ -91,7 +40,7 @@ def main():
     opt1 = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     opt2 = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.90)
     opts = [opt2, opt1]
-    opt_use_adam = settings.OPT_USE_ADAM
+    opt_use_adam = OPT_USE_ADAM
     
     for epoch in range(TOTAL_EPOCHS):
         optimizer = opts[int(opt_use_adam)]
