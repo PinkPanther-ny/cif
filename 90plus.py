@@ -50,15 +50,15 @@ def main():
     
     def preprocess():
 
-        trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
+        trainset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True,
                                                 download=True, transform=transform_train)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                                shuffle=True, num_workers=num_workers)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
+                                                shuffle=True, num_workers=NUM_WORKERS)
 
-        testset = torchvision.datasets.CIFAR10(root=data_dir, train=False,
+        testset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False,
                                             download=True, transform=transform_test)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                                shuffle=False, num_workers=num_workers)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
+                                                shuffle=False, num_workers=NUM_WORKERS)
         # Return iterable which contains data in blocks, block size equals to batch size
         return trainloader, testloader
     
@@ -68,61 +68,62 @@ def main():
 
     model = Net()
     
-    if load_model:
-        model.load_state_dict(torch.load(model_dir + model_name))
+    if LOAD_MODEL:
+        model.load_state_dict(torch.load(MODEL_DIR + MODEL_NAME))
     
     # del model._modules["resnet18"]
     # torch.save(model.state_dict(), model_dir + "87_92_1.pth")
     # return
 
-    # Assuming that we are on a CUDA machine, this should print a CUDA device:
-
-    print(device)
-    model.to(device)
+    # Assuming that we are on a CUDA machine
+    model.to(DEVICE)
     
     # Start timer from here
     timer.timeit()
-    if load_model:
-        print(f"Verifying loaded model ({model_name})'s accuracy as its name suggested...")
-        eval_total(model, testloader, timer, 12)
+    
+    if LOAD_MODEL:
+        print(f"Verifying loaded model ({MODEL_NAME})'s accuracy as its name suggested...")
+        eval_total(model, testloader, timer)
     else:
         print("Start training!")
     
     criterion = nn.CrossEntropyLoss()
-    opt1 = optim.Adam(model.parameters(), lr=learning_rate)
-    opt2 = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.90)
+    opt1 = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    opt2 = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.90)
     opts = [opt2, opt1]
-    opt_use_adam = settings.opt_use_adam
+    opt_use_adam = settings.OPT_USE_ADAM
     
-    for epoch in range(epochs):
+    for epoch in range(TOTAL_EPOCHS):
         optimizer = opts[int(opt_use_adam)]
         
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
             inputs, labels = data
-
+            
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward + backward + optimize
-            outputs = model(inputs.to(device))
-            loss = criterion(outputs, labels.to(device))
+            outputs = model(inputs.to(DEVICE))
+            loss = criterion(outputs, labels.to(DEVICE))
             loss.backward()
             optimizer.step()
             
             # print statistics
             running_loss += loss.item() * inputs.shape[0]
-            count_log = int(math.ceil(data_size/batch_size) / n_batch_logs_per_epoch) - 1
+            
+            count_log = int(len(trainloader) / N_LOGS_PER_EPOCH)
+            # print(count_log, inputs.shape)
             if i % count_log == count_log - 1:
                 print(f'[{epoch + 1}(Epochs), {i + 1:5d}(batches)] loss: {running_loss / count_log:.3f}')
                 running_loss = 0.0
 
-        if adam_sgd_switch:
-            if epoch % epochs_per_switch == 0:
+        if ADAM_SGD_SWITCH:
+            if epoch % EPOCHS_PER_SWITCH == 0:
                 opt_use_adam = not opt_use_adam
                 print(f"Epoch {epoch + 1}: Opt switched to {'Adam' if opt_use_adam else 'SGD'}")
         
-        if epoch % epochs_per_eval == 0:
+        if epoch % EPOCHS_PER_EVAL == 0:
             eval_total(model, testloader, timer, epoch)
 
     print('Training Finished!')

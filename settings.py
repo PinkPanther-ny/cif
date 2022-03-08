@@ -1,45 +1,43 @@
-# ==============================================
-# GLOBAL SETTINGS
 import os
 import sys
-
 import torch
+# ==============================================
+# GLOBAL SETTINGS
 
-if len(sys.argv) != 2:
-    cuda_n = 0
-    print("Run on GPU:0 by default")
-else:
-    cuda_n = sys.argv[1]
-    print(f"Run on GPU:{cuda_n}")
+BATCH_SIZE = 256
+LEARNING_RATE = 5e-6
+TOTAL_EPOCHS = 500
 
-device = torch.device(f'cuda:{cuda_n}' if torch.cuda.is_available() else 'cpu')
-print(device)
-batch_size = 7
-opt_use_adam = True
-learning_rate = 5e-6
-epochs = 500
+OPT_USE_ADAM = True
 
-load_model = True
-model_name = "89_98.pth"
-model_save_threshold = 89.6
+LOAD_MODEL = True
+MODEL_NAME = "89_98.pth"
+MODEL_SAVE_THRESHOLD = 89.6
 
-# working_dir = "/datav/alvin/CIF/"
-# model_dir = "/datav/alvin/CIF/models/"
-working_dir = os.path.dirname(os.path.realpath(__file__))
-model_dir = working_dir + "/models/"
-data_dir = working_dir + '/data/'
-
-num_workers = 1
-
-data_size = 60000
-n_batch_logs_per_epoch = 3
-
-classes = ('plane', 'car', 'bird', 'cat', 'deer',
-        'dog', 'frog', 'horse', 'ship', 'truck')
+NUM_WORKERS = 4
+N_LOGS_PER_EPOCH = 3
 
 # ==============================================
 # SPECIAL SETTINGS
-epochs_per_eval = 2
+EPOCHS_PER_EVAL = 2
 
-adam_sgd_switch = True
-epochs_per_switch = 1
+ADAM_SGD_SWITCH = False
+EPOCHS_PER_SWITCH = 5
+
+# ==============================================
+# NOT SUPPOSED TO BE CHANGED OFTENLY
+
+if len(sys.argv) != 2:
+    CUDA_N = 0
+    print("Run on GPU:0 by default")
+else:
+    CUDA_N = sys.argv[1]
+    print(f"Run on GPU:{CUDA_N}")
+
+DEVICE = torch.device(f'cuda:{CUDA_N}' if torch.cuda.is_available() else 'cpu')
+
+WORKING_DIR = os.path.dirname(os.path.realpath(__file__))
+MODEL_DIR = WORKING_DIR + "/models/"
+DATA_DIR = WORKING_DIR + '/data/'
+CLASSES = ('plane', 'car', 'bird', 'cat', 'deer',
+        'dog', 'frog', 'horse', 'ship', 'truck')
