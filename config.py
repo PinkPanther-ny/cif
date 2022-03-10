@@ -16,6 +16,7 @@ class Config:
 
         self.LOAD_MODEL:bool = False
         self.MODEL_NAME:str = "56_19.pth"
+        self.LOAD_BEST:bool = False
         self.EPOCH_TO_LOAD_BEST:int = 15
         
         self.MODEL_SAVE_THRESHOLD:float = 0
@@ -28,7 +29,7 @@ class Config:
         # SPECIAL SETTINGS
         self.EPOCHS_PER_EVAL:int = 2
 
-        self.ADAM_SGD_SWITCH:bool = True
+        self.ADAM_SGD_SWITCH:bool = False
         self.EPOCHS_PER_SWITCH:int = 15
 
         # ==============================================

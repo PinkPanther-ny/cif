@@ -46,7 +46,7 @@ def main():
     # ========================== Train =============================
     for epoch in range(configs.TOTAL_EPOCHS):
         
-        if epoch % configs.EPOCH_TO_LOAD_BEST == 0:
+        if configs.LOAD_BEST and epoch % configs.EPOCH_TO_LOAD_BEST == 0:
             best_model = load_best3()
             if best_model != '':
                 model.load_state_dict(torch.load(configs.MODEL_DIR + best_model, map_location=torch.device("cpu")))
