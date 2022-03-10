@@ -9,14 +9,17 @@ class Config:
         # GLOBAL SETTINGS
 
         self.BATCH_SIZE:int = 256
-        self.LEARNING_RATE:float = 1e-3
-        self.TOTAL_EPOCHS:int = 200
+        self.LEARNING_RATE:float = 1e-4
+        self.TOTAL_EPOCHS:int = 400
 
         self.OPT_USE_ADAM:bool = True
 
         self.LOAD_MODEL:bool = False
-        self.MODEL_NAME:str = "89_98.pth"
-        self.MODEL_SAVE_THRESHOLD:float = 89.6
+        self.MODEL_NAME:str = "56_19.pth"
+        self.EPOCH_TO_LOAD_BEST:int = 15
+        
+        self.MODEL_SAVE_THRESHOLD:float = 0
+
 
         self.NUM_WORKERS:int = 4
         self.N_LOGS_PER_EPOCH:int = 3
@@ -25,8 +28,8 @@ class Config:
         # SPECIAL SETTINGS
         self.EPOCHS_PER_EVAL:int = 2
 
-        self.ADAM_SGD_SWITCH:bool = False
-        self.EPOCHS_PER_SWITCH:int = 5
+        self.ADAM_SGD_SWITCH:bool = True
+        self.EPOCHS_PER_SWITCH:int = 15
 
         # ==============================================
         # NOT SUPPOSED TO BE CHANGED OFTENLY
@@ -41,7 +44,7 @@ class Config:
         self.DEVICE:str = f'cuda:{self.CUDA_N}' if torch.cuda.is_available() else 'cpu'
 
         self.WORKING_DIR:str = os.path.dirname(os.path.realpath(__file__))
-        self.MODEL_DIR:str = self.WORKING_DIR + "/models/"
+        self.MODEL_DIR:str = self.WORKING_DIR + "/models_64/"
         self.DATA_DIR:str = self.WORKING_DIR + '/data/'
         self.CLASSES:list = ('plane', 'car', 'bird', 'cat', 'deer',
                 'dog', 'frog', 'horse', 'ship', 'truck')

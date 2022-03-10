@@ -3,9 +3,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import gc
+from find_best import load_best3
 
 from helper import Timer, eval_total
-from model_class import Net
+from model_class import Net, Net2
 from preprocess import preprocessor
 from config import configs
 
@@ -13,26 +14,28 @@ from config import configs
 def main():
 
     timer = Timer()
+
+    
     p = preprocessor()
     trainloader, testloader = p.get_loader()
     
     model = Net()
     
-    if configs.LOAD_MODEL:
-        model.load_state_dict(torch.load(configs.MODEL_DIR + configs.MODEL_NAME))
+    try:
+        if configs.LOAD_MODEL:
+            model.load_state_dict(torch.load(configs.MODEL_DIR + configs.MODEL_NAME))
+            # Assuming that we are on a CUDA machine
+            model.to(torch.device(configs.DEVICE))
+            print(f"\nVerifying loaded model ({configs.MODEL_NAME})'s accuracy as its name suggested...")
+            eval_total(model, testloader, timer)
+    except FileNotFoundError:
+        print(f"{configs.MODEL_NAME} Model not found!")
 
-    # Assuming that we are on a CUDA machine
     model.to(torch.device(configs.DEVICE))
-    
     # Start timer from here
     timer.timeit()
     
-    if configs.LOAD_MODEL:
-        print(f"\nVerifying loaded model ({configs.MODEL_NAME})'s accuracy as its name suggested...")
-        eval_total(model, testloader, timer)
-        
-    
-    print(f"Start training! Total {configs.TOTAL_EPOCHS} epochs.")
+    print(f"Start training! Total {configs.TOTAL_EPOCHS} epochs.\n")
     
     criterion = nn.CrossEntropyLoss()
     opt1 = optim.Adam(model.parameters(), lr=configs.LEARNING_RATE)
@@ -42,6 +45,15 @@ def main():
     
     # ========================== Train =============================
     for epoch in range(configs.TOTAL_EPOCHS):
+        
+        if epoch % configs.EPOCH_TO_LOAD_BEST == 0:
+            best_model = load_best3()
+            if best_model != '':
+                model.load_state_dict(torch.load(configs.MODEL_DIR + best_model, map_location=torch.device("cpu")))
+                model.to(torch.device(configs.DEVICE))
+                print(f"Verifying loaded model ({best_model})'s accuracy as its name suggested...")
+                eval_total(model, testloader, timer)
+        
         optimizer = opts[int(opt_use_adam)]
         
         running_loss = 0.0
@@ -66,7 +78,7 @@ def main():
                 running_loss = 0.0
 
         if configs.ADAM_SGD_SWITCH:
-            if epoch % configs.EPOCHS_PER_SWITCH == 0:
+            if epoch % configs.EPOCHS_PER_SWITCH == configs.EPOCHS_PER_SWITCH - 1:
                 opt_use_adam = not opt_use_adam
                 print(f"Epoch {epoch + 1}: Opt switched to {'Adam' if opt_use_adam else 'SGD'}")
         

@@ -2,6 +2,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
+from autoaugment import CIFAR10Policy
 from config import configs
 
 class preprocessor:
@@ -9,36 +10,54 @@ class preprocessor:
     # transform_train = transforms.Compose([
     #     transforms.RandomResizedCrop(32, scale=(0.8, 1.1), ratio=(0.75, 1.333333)),
     #     transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
-    #     transforms.RandomRotation(degrees=(-20, 20)),  #影象一半的概率翻轉，一半的概率不翻轉
-    #     transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.25, hue=0.2),
     #     transforms.ToTensor(),
     #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
     #     ])
-
+    
     # transform_train = transforms.Compose([
-    #     transforms.Resize(size=(224, 224)),
+    #     transforms.RandomCrop(32, padding=4),  #先四周填充0，在吧影象隨機裁剪成32*32
     #     transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
     #     transforms.ToTensor(),
     #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
     #     ])
-    
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),  #先四周填充0，在吧影象隨機裁剪成32*32
-        transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
-        ])
 
-    transform_test = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-        ])
+
     
-    def __init__(self) -> None:
+    def __init__(self, trans = None) -> None:
         
         self.data_dir = configs.DATA_DIR
         self.batch_size = configs.BATCH_SIZE
         self.n_workers = configs.NUM_WORKERS
+        if trans is None:
+            # self.transform_train = transforms.Compose([
+            #     transforms.RandomCrop(32, padding=4),
+            #     transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
+            #     transforms.ToTensor(),
+            #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
+            #     transforms.RandomRotation(degrees=(-25, 25)),  #影象一半的概率翻轉，一半的概率不翻轉
+            #     ])
+            self.transform_train = transforms.Compose([
+                transforms.RandomCrop(32, padding=4, padding_mode="constant"),  #先四周填充0，在吧影象隨機裁剪成32*32
+                transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
+                ])
+            # self.transform_train = transforms.Compose([
+            #     transforms.Resize(256),
+            #     CIFAR10Policy(),
+            #     transforms.RandomHorizontalFlip(),
+            #     # transforms.Resize(32),
+            #     transforms.ToTensor(),
+            #     transforms.Resize(64),
+            #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            # ])
+        else:
+            self.transform_train = trans
+            
+        self.transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            ])
         
     def get_loader(self):
 
