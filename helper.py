@@ -8,7 +8,7 @@ class Timer:
         self.last = 0
         self.curr = 0
         
-    def timeit(self):
+    def timeit(self)->float:
         if self.last == 0 and self.curr == 0:
             self.last = time.time()
             self.curr = time.time()
@@ -19,7 +19,7 @@ class Timer:
             return round(self.curr - self.last, 2), round(self.curr - self.ini, 2)
 
 
-def eval_total(model, testloader, timer, epoch=-1):
+def eval_total(model, testloader, timer, device, epoch=-1):
     model.eval()
     correct = 0
     total = 0
@@ -29,15 +29,17 @@ def eval_total(model, testloader, timer, epoch=-1):
         for data in testloader:
             images, labels = data
             # calculate outputs by running images through the network
-            outputs = model(images.to(configs.DEVICE))
+            outputs = model(images.to(device))
             # the class with the highest energy is what we choose as prediction
             _, predicted = torch.max(outputs.cpu().data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            
     save_model = 100 * correct / total >= configs.MODEL_SAVE_THRESHOLD
-    if save_model:
-        torch.save(model.state_dict(), configs.MODEL_DIR + f"{100 * correct / total}".replace('.', '_') + '.pth')
-    print(f"{'''''' if epoch==-1 else '''Epoch ''' + str(epoch) + ''': '''}Accuracy of the network on the 10000 test images: {100 * correct / float(total)} % ({'saved' if save_model else 'discarded'})")
+    print(f"{'''''' if epoch==-1 else '''Epoch ''' + str(epoch) + ''': '''}Accuracy of the network on the {total} test images: {100 * correct / float(total)} % ({'saved' if save_model else 'discarded'})")
     t = timer.timeit()
     print(f"Delta time: {t[0]}, Already: {t[1]}\n")
+    if save_model:
+        torch.save(model.state_dict(), configs.MODEL_DIR + f"{100 * correct / total}".replace('.', '_') + '.pth')
+
     model.train()

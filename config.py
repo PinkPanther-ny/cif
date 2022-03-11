@@ -1,22 +1,20 @@
 import os
-import sys
-import torch
 import json
-
+os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, [0, 1, 2, 3]))
 class Config:
     def __init__(self, *dict_config) -> None:
         # ==============================================
         # GLOBAL SETTINGS
 
-        self.BATCH_SIZE:int = 256
-        self.LEARNING_RATE:float = 1e-4
+        self.BATCH_SIZE:int = 512
+        self.LEARNING_RATE:float = 1e-3
         self.TOTAL_EPOCHS:int = 400
 
         self.OPT_USE_ADAM:bool = True
 
-        self.LOAD_MODEL:bool = False
-        self.MODEL_NAME:str = "56_19.pth"
-        self.LOAD_BEST:bool = False
+        self.LOAD_MODEL:bool = True
+        self.MODEL_NAME:str = "82_0.pth"
+        self.LOAD_BEST:bool = True
         self.EPOCH_TO_LOAD_BEST:int = 15
         
         self.MODEL_SAVE_THRESHOLD:float = 0
@@ -27,7 +25,7 @@ class Config:
 
         # ==============================================
         # SPECIAL SETTINGS
-        self.EPOCHS_PER_EVAL:int = 2
+        self.EPOCHS_PER_EVAL:int = 3
 
         self.ADAM_SGD_SWITCH:bool = False
         self.EPOCHS_PER_SWITCH:int = 15
@@ -35,17 +33,18 @@ class Config:
         # ==============================================
         # NOT SUPPOSED TO BE CHANGED OFTENLY
 
-        if len(sys.argv) != 2:
-            self.CUDA_N:int = 0
-            print("Run on GPU:0 by default")
-        else:
-            self.CUDA_N:int = int(sys.argv[1])
-            print(f"Run on GPU:{self.CUDA_N}")
+        # self.CUDA_N:int = 0
+        # if len(sys.argv) != 2:
+        #     self.CUDA_N:int = 0
+        #     # print("Run on GPU:0 by default")
+        # else:
+        #     self.CUDA_N:int = int(sys.argv[1])
+        #     # print(f"Run on GPU:{self.CUDA_N}")
 
-        self.DEVICE:str = f'cuda:{self.CUDA_N}' if torch.cuda.is_available() else 'cpu'
+        # self.DEVICE:str = f'cuda:{self.CUDA_N}' if torch.cuda.is_available() else 'cpu'
 
         self.WORKING_DIR:str = os.path.dirname(os.path.realpath(__file__))
-        self.MODEL_DIR:str = self.WORKING_DIR + "/models_64/"
+        self.MODEL_DIR:str = self.WORKING_DIR + "/models_ddp/"
         self.DATA_DIR:str = self.WORKING_DIR + '/data/'
         self.CLASSES:list = ('plane', 'car', 'bird', 'cat', 'deer',
                 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -74,5 +73,5 @@ class Config:
             print("Config file does not exits, use default value instead!")
             
 configs = Config()
-configs.load()
+# configs.load()
 # configs.save()
