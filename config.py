@@ -7,28 +7,28 @@ class Config:
         # GLOBAL SETTINGS
 
         self.BATCH_SIZE:int = 512
-        self.LEARNING_RATE:float = 1e-3
+        self.LEARNING_RATE:float = 1e-5
         self.TOTAL_EPOCHS:int = 400
 
         self.OPT_USE_ADAM:bool = True
 
         self.LOAD_MODEL:bool = True
-        self.MODEL_NAME:str = "82_0.pth"
-        self.LOAD_BEST:bool = True
+        self.MODEL_NAME:str = "92_43.pth"
+        self.LOAD_BEST:bool = False
         self.EPOCH_TO_LOAD_BEST:int = 15
         
-        self.MODEL_SAVE_THRESHOLD:float = 0
+        self.MODEL_SAVE_THRESHOLD:float = 91.5
 
 
         self.NUM_WORKERS:int = 4
-        self.N_LOGS_PER_EPOCH:int = 3
+        self.N_LOGS_PER_EPOCH:int = 0
 
         # ==============================================
         # SPECIAL SETTINGS
         self.EPOCHS_PER_EVAL:int = 3
 
-        self.ADAM_SGD_SWITCH:bool = False
-        self.EPOCHS_PER_SWITCH:int = 15
+        self.ADAM_SGD_SWITCH:bool = True
+        self.EPOCHS_PER_SWITCH:int = 30
 
         # ==============================================
         # NOT SUPPOSED TO BE CHANGED OFTENLY

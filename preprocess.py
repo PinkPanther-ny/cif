@@ -39,6 +39,7 @@ class preprocessor:
             self.transform_train = transforms.Compose([
                 transforms.RandomCrop(32, padding=4, padding_mode="constant"),  #先四周填充0，在吧影象隨機裁剪成32*32
                 transforms.RandomHorizontalFlip(),  #影象一半的概率翻轉，一半的概率不翻轉
+                transforms.RandomRotation(degrees=(-15, 15)),
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), #R,G,B每層的歸一化用到的均值和方差
                 ])

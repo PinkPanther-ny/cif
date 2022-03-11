@@ -72,7 +72,7 @@ def main():
         trainloader.sampler.set_epoch(epoch)
         
         # Just for removing worst models
-        if local_rank == 0 and configs.LOAD_BEST and epoch % configs.EPOCH_TO_LOAD_BEST == 0:
+        if epoch % configs.EPOCH_TO_LOAD_BEST == 0:
             remove_bad_models()
 
         # By my stategy, chose optimizer dynamically
