@@ -79,7 +79,7 @@ def main():
         optimizer = opts[int(opt_use_adam)]
         
         # Counter for printing information during training
-        count_log = int(len(trainloader) / configs.N_LOGS_PER_EPOCH)
+        count_log = 0 if configs.N_LOGS_PER_EPOCH == 0 else int(len(trainloader) / configs.N_LOGS_PER_EPOCH)
         
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
@@ -102,7 +102,7 @@ def main():
             # print statistics
             running_loss += loss.item() * inputs.shape[0]
             
-            if local_rank == 0 and i % count_log == count_log - 1:
+            if count_log != 0 and local_rank == 0 and i % count_log == count_log - 1:
                 print(f'[{epoch + 1}(Epochs), {i + 1:5d}(batches)] loss: {running_loss / count_log:.3f}')
                 running_loss = 0.0
                 

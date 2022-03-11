@@ -8,7 +8,7 @@ class Config:
 
         self.BATCH_SIZE:int = 512
         self.LEARNING_RATE:float = 1e-5
-        self.TOTAL_EPOCHS:int = 400
+        self.TOTAL_EPOCHS:int = 4000
 
         self.OPT_USE_ADAM:bool = True
 
